@@ -1,0 +1,11 @@
+# Repo-specific tools and tasks only; the org belt arrives globally.
+# ci is assembled by the toolbelt: define test/build/lint:* tasks here
+# and they are collected automatically.
+#
+# The anchor has none. It carries checkpoint JSON and prose, so it
+# declares no toolchain and no test or build task — the belt's linters
+# guard for applicability and skip clean, which is the applicability
+# design working rather than a gap (.github#673).
+
+[settings]
+lockfile = true
