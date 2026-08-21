@@ -1,0 +1,41 @@
+# The org gate. This stub is a repo's entire CI obligation: everything else
+# (linters, versions, enforcement) arrives via the shared workflow and the
+# toolbelt it pins. Update the SHA when moving to a newer gate; once the
+# .github repo cuts releases, Renovate manages this pin like any other.
+---
+name: gate
+
+"on":
+  # `edited` is load-bearing: the shared gate lints the squash subject
+  # from the PR title, and title/base changes arrive only as `edited`
+  # events — without it a fixed title stays red and a broken one stays
+  # green (.github#427). Do not slim back to the default types.
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - edited
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    permissions:
+      # Stated, not inherited: a `uses:` job takes the WORKFLOW-level
+      # default, never the caller's ambient grant, so a shared workflow
+      # that gains a permission kills silent callers as startup_failure
+      # (the gate.yml convention; lint:nested-permissions enforces it —
+      # measured on stele's standup, where this template's silence was
+      # the one gate finding).
+      contents: read # checkout of this repo and of the toolbelt
+    uses: monumental-archive/.github/.github/workflows/ci.yml@71b9c85bc0c2f7777c8baf1482266a863a96ea16 # v1.51.0
+...
