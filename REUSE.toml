@@ -1,0 +1,18 @@
+# REUSE.toml (spec 3.3): machine-readable licensing for every file in
+# the anchor. The licence is CC0-1.0, chosen when the repository was
+# founded and kept at import: the contents are cryptographic digests
+# published as public verification infrastructure, and a copy of this
+# repository IS the verification infrastructure — a licence that
+# waives every condition is the licence that matches the intent.
+# Aggregate precedence over the whole tree: checkpoints, configuration
+# and workflows do not carry per-file headers.
+version = 1
+SPDX-PackageName = "monumental-archive-ledger"
+SPDX-PackageSupplier = "Carl Allen <carl.allen313@gmail.com>"
+SPDX-PackageDownloadLocation = "https://github.com/monumental-archive/monumental-archive-ledger"
+
+[[annotations]]
+path = ["**"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Carl Allen"
+SPDX-License-Identifier = "CC0-1.0"

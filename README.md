@@ -1,7 +1,5 @@
 # Monumental Archive — ledger checkpoint chain
 
-[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/CarlAllenn/monumental-archive-ledger/badge)](https://scorecard.dev/viewer/?uri=github.com/CarlAllenn/monumental-archive-ledger)
-
 This repository is the **public anchor** for the Monumental Archive's
 acts ledger (ADR 0022 §one-checkpoint-chain). It contains no archive
 content — only cryptographic checkpoints: hashes of hashes.
