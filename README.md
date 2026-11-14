@@ -1,5 +1,13 @@
 # Monumental Archive — ledger checkpoint chain
 
+<!-- badges:begin -->
+[![ci](https://github.com/monumental-archive/monumental-archive-ledger/actions/workflows/ci.yml/badge.svg)](https://github.com/monumental-archive/monumental-archive-ledger/actions/workflows/ci.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/monumental-archive/monumental-archive-ledger/badge)](https://scorecard.dev/viewer/?uri=github.com/monumental-archive/monumental-archive-ledger)
+<!-- pending (human step): OpenSSF Best Practices — answer the form from docs/best-practices.md, then set 'bestpractices <BP_ID>' in .badge-states and re-run fix:badges -->
+<!-- pending (human step): REUSE — register at https://api.reuse.software/register (no account: name, email, project URL, confirmation link), then set 'reuse registered' in .badge-states and re-run fix:badges -->
+[![fair-software](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%E2%97%8F%20%E2%97%8B%20%E2%97%8B%20%E2%97%8B-orange)](https://fair-software.eu)
+<!-- badges:end -->
+
 This repository is the **public anchor** for the Monumental Archive's
 acts ledger (ADR 0022 §one-checkpoint-chain). It contains no archive
 content — only cryptographic checkpoints: hashes of hashes.
