@@ -2,10 +2,23 @@
 # ci is assembled by the toolbelt: define test/build/lint:* tasks here
 # and they are collected automatically.
 #
-# The anchor has none. It carries checkpoint JSON and prose, so it
-# declares no toolchain and no test or build task — the belt's linters
-# guard for applicability and skip clean, which is the applicability
-# design working rather than a gap (.github#673).
+# The anchor carries checkpoint JSON and prose, so it declares no
+# toolchain and no build task — the belt's linters guard for
+# applicability and skip clean (.github#673). Its one task is `test`,
+# below: the verifier runs on the belt's pinned Python, standard library
+# only.
 
 [settings]
 lockfile = true
+
+# The repository's own test (#27): the README says anyone can verify
+# that the head chain is internally consistent and that history here
+# only appends, so the gate does exactly that, with the same command a
+# stranger runs, then runs the verifier's own table tests. The belt's
+# `ci` collects `test` when a repository defines it.
+[tasks.test]
+description = "Verify the published checkpoint chain, then the verifier's own tests"
+run = """
+python3 verify/verify-chain.py
+python3 -m unittest discover --start-directory verify --pattern "test_*.py"
+"""

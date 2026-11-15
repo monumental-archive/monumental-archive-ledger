@@ -1,0 +1,9 @@
+{
+  "v": 1,
+  "seq": 0,
+  "prev_head": null,
+  "merkle_root": "55a535de5ce5442255a6465a8590a2d78155e94b3c5dbf2a0aba49da8e86b7be",
+  "act_count": 3,
+  "last_act_id": "0193a6f4-1c2d-7e3f-8a4b-5c6d7e8f9a00",
+  "head": "787eac210ef9f7e4280da47f635b5bf3a7eb3be7285ef0dc8330e1dfae2bf761"
+}
