@@ -22,9 +22,11 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import subprocess  # ruff: ignore[suspicious-subprocess-import]
 import sys
+from functools import cache
 from pathlib import Path
 
 PROG = "verify-chain"
@@ -203,6 +205,39 @@ def verify_files(directory: Path) -> list[dict[str, object]]:
     return chain
 
 
+@cache
+def repository_env_vars() -> frozenset[str]:
+    """Name the variables through which git's caller picks a repository.
+
+    Git exports GIT_DIR and its siblings to hooks, so a verifier run from
+    a pre-push hook inherits them, and they override `git -C`: every
+    command would then read the pushing repository, whatever `--repo`
+    says. The list is git's own (`git rev-parse --local-env-vars`).
+
+    Returns:
+        The variable names.
+
+    """
+    result = subprocess.run(
+        ["git", "rev-parse", "--local-env-vars"],  # ruff: ignore[start-process-with-partial-path]
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    return frozenset(result.stdout.split())
+
+
+def git_env() -> dict[str, str]:
+    """Copy the environment without the variables that pick a repository.
+
+    Returns:
+        The environment for a `git -C <repo>` command.
+
+    """
+    drop = repository_env_vars()
+    return {k: v for k, v in os.environ.items() if k not in drop}
+
+
 def _git(repo: Path, *args: str) -> subprocess.CompletedProcess[str]:
     # ruff: ignore[subprocess-without-shell-equals-true]
     return subprocess.run(
@@ -210,6 +245,7 @@ def _git(repo: Path, *args: str) -> subprocess.CompletedProcess[str]:
         capture_output=True,
         text=True,
         check=False,
+        env=git_env(),
     )
 
 
