@@ -11,6 +11,11 @@
 [settings]
 lockfile = true
 
+# The task shell, pinned: mise's default is `sh`, which is dash on an
+# Ubuntu runner (lint:belt-shell, #700).
+[task_config]
+shell = "bash -euo pipefail -c"
+
 # The repository's own test (#27): the README says anyone can verify
 # that the head chain is internally consistent and that history here
 # only appends, so the gate does exactly that, with the same command a
