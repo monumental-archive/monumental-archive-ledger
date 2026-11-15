@@ -69,6 +69,23 @@ def write(repo: Path, record: dict[str, object], name: str | None = None) -> Non
     (repo / "checkpoints" / name).write_text(text, encoding="utf-8")
 
 
+def git_in(repo: Path, *args: str) -> None:
+    """Run git in a throwaway repository, never the one running the tests.
+
+    A pre-push hook exports GIT_DIR and its siblings, and they override
+    `git -C`: without stripping them, `git init` here re-initialised the
+    PUSHING repository and set its `core.bare` to true (measured on the
+    first hooked push of this suite).
+    """
+    # ruff: ignore[subprocess-without-shell-equals-true]
+    subprocess.run(
+        ["git", "-C", str(repo), *args],  # ruff: ignore[start-process-with-partial-path]
+        check=True,
+        capture_output=True,
+        env=vc.git_env(),
+    )
+
+
 class ChainCase(unittest.TestCase):
     """Each case runs in a fresh git repository with origin/main set."""
 
@@ -86,12 +103,7 @@ class ChainCase(unittest.TestCase):
 
     def git(self, *args: str) -> None:
         """Run git in the throwaway repository."""
-        # ruff: ignore[subprocess-without-shell-equals-true]
-        subprocess.run(
-            ["git", "-C", str(self.repo), *args],  # ruff: ignore[start-process-with-partial-path]
-            check=True,
-            capture_output=True,
-        )
+        git_in(self.repo, *args)
 
     def commit(self, message: str) -> None:
         """Commit everything and point origin/main at the result."""
@@ -164,6 +176,36 @@ class Green(ChainCase):
                 ),
                 "",
             ),
+        )
+
+    def test_ignores_the_callers_repository(self) -> None:
+        """Run as from a hook: GIT_DIR names another repository.
+
+        The verifier must still judge `--repo`, and must leave the other
+        repository exactly as it was.
+        """
+        self.publish(0, 1, 2)
+        other = Path(tempfile.mkdtemp(prefix="verify-chain-caller-"))
+        self.addCleanup(shutil.rmtree, other)
+        git_in(other, "init", "-q", "-b", "main")
+        config = (other / ".git" / "config").read_text(encoding="utf-8")
+        os.environ["GIT_DIR"] = str(other / ".git")
+        os.environ["GIT_WORK_TREE"] = str(other)
+        status, out, err = self.run_verifier()
+        self.assertEqual(
+            (status, out, err),
+            (
+                0,
+                (
+                    f"verify-chain: 3 checkpoint(s) verified, head {HEADS[2]}, "
+                    "append-only against HEAD~1\n"
+                ),
+                "",
+            ),
+        )
+        self.assertEqual(
+            (other / ".git" / "config").read_text(encoding="utf-8"),
+            config,
         )
 
     def test_appending_on_a_branch(self) -> None:
