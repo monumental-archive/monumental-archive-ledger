@@ -4,10 +4,11 @@
 [![ci](https://github.com/monumental-archive/monumental-archive-ledger/actions/workflows/ci.yml/badge.svg)](https://github.com/monumental-archive/monumental-archive-ledger/actions/workflows/ci.yml)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/monumental-archive/monumental-archive-ledger/badge)](https://scorecard.dev/viewer/?uri=github.com/monumental-archive/monumental-archive-ledger)
 [![SLSA source](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fmonumental-archive%2Fmonumental-archive-ledger%2Flevels%2Fmonumental-archive-ledger%2Fsource.shield.json)](https://raw.githubusercontent.com/monumental-archive/monumental-archive-ledger/levels/monumental-archive-ledger/source.report.json)
-<!-- pending (human step): OpenSSF Best Practices — answer the form from docs/best-practices.md, then set 'bestpractices <BP_ID>' in .badge-states and re-run fix:badges -->
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/16736/badge)](https://www.bestpractices.dev/projects/16736)
+[![OpenSSF Baseline](https://www.bestpractices.dev/projects/16736/baseline)](https://www.bestpractices.dev/projects/16736)
 [![REUSE status](https://api.reuse.software/badge/github.com/monumental-archive/monumental-archive-ledger)](https://api.reuse.software/info/github.com/monumental-archive/monumental-archive-ledger)
 [![license](https://img.shields.io/badge/license-CC0--1.0-blue)](LICENSES/)
-[![fair-software](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%E2%97%8F%20%E2%97%8B%20%E2%97%8B%20%E2%97%8B-orange)](https://fair-software.eu)
+[![fair-software](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%E2%97%8F%20%E2%97%8B%20%E2%97%8B%20%E2%97%8F-orange)](https://fair-software.eu)
 <!-- badges:end -->
 
 This repository is the **public anchor** for the Monumental Archive's
