@@ -17,7 +17,8 @@ content — only cryptographic checkpoints: hashes of hashes.
 ## What a checkpoint is
 
 Each file in [`checkpoints/`](checkpoints/) is one sealed period of the
-archive's append-only ledger:
+archive's append-only ledger, named by its `seq` zero-padded to eight
+digits (`00000000.json`, `00000001.json`, …):
 
 ```json
 {
@@ -55,11 +56,30 @@ and when, while its destroyed payload stays unrecoverable.
 ## Verifying
 
 Anyone with read access to the archive database can re-derive the whole
-chain from ledger zero and diff it against these files (the archive runs
-exactly that check in CI, and refuses to publish a checkpoint that does
-not re-derive). Third parties without database access verify the weaker
-but still meaningful properties: the head chain is internally
-consistent, and history here only ever appends.
+chain from ledger zero. The archive re-derives its database chain before
+it publishes, and refuses to publish a checkpoint that does not
+re-derive. This repository checks the published files.
+
+Third parties without database access verify the weaker but still
+meaningful properties: the head chain is internally consistent, and
+history here only ever appends. From any clone, with Python 3 and git:
+
+```bash
+python3 verify/verify-chain.py
+```
+
+It fails by name unless every checkpoint has exactly the seven fields
+above, `seq` runs 0, 1, 2 … under its file name, each `prev_head` is
+the previous checkpoint's `head` (`null` at `seq` 0), each `head`
+recomputes, and no checkpoint that existed at the merge base with
+`origin/main` (on `main` itself, the previous commit) has been
+modified, renamed or deleted. This repository's gate runs the same
+command and the verifier's own tests as its `test` task.
+
+Known gap: nothing compares the two. The archive verifies its database
+and this repository verifies its files; no automated check diffs one
+against the other. Nor is the Merkle root checked here: it needs the
+acts, which never enter this repository by design.
 
 Clones welcome — a copy of this repository IS the verification
 infrastructure.

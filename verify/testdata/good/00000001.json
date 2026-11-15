@@ -1,0 +1,9 @@
+{
+  "v": 1,
+  "seq": 1,
+  "prev_head": "787eac210ef9f7e4280da47f635b5bf3a7eb3be7285ef0dc8330e1dfae2bf761",
+  "merkle_root": "c02c0b965e023abee808f2b548d8d5193a8b5229be6f3121a6f16e2d41a449b3",
+  "act_count": 1,
+  "last_act_id": "0193a6f5-0000-7000-9000-000000000001",
+  "head": "76c4fe1b5dee2af384d2e25c760024d719f2c18b56ead995939344acd9b1219b"
+}
