@@ -24,7 +24,7 @@ import hashlib
 import json
 import os
 import re
-import subprocess  # ruff: ignore[suspicious-subprocess-import]
+import subprocess
 import sys
 from functools import cache
 from pathlib import Path
@@ -239,7 +239,6 @@ def git_env() -> dict[str, str]:
 
 
 def _git(repo: Path, *args: str) -> subprocess.CompletedProcess[str]:
-    # ruff: ignore[subprocess-without-shell-equals-true]
     return subprocess.run(
         ["git", "-C", str(repo), *args],  # ruff: ignore[start-process-with-partial-path]
         capture_output=True,

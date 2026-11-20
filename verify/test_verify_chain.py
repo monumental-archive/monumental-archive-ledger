@@ -18,7 +18,7 @@ import io
 import json
 import os
 import shutil
-import subprocess  # ruff: ignore[suspicious-subprocess-import]
+import subprocess
 import tempfile
 import unittest
 from contextlib import redirect_stderr, redirect_stdout
@@ -71,7 +71,6 @@ def git_in(repo: Path, *args: str) -> None:
     PUSHING repository and set its `core.bare` to true (measured on the
     first hooked push of this suite).
     """
-    # ruff: ignore[subprocess-without-shell-equals-true]
     subprocess.run(
         ["git", "-C", str(repo), *args],  # ruff: ignore[start-process-with-partial-path]
         check=True,
