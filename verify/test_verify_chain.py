@@ -23,6 +23,7 @@ import tempfile
 import unittest
 from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
+from typing import override
 from unittest import mock
 
 import verify_chain as vc
@@ -52,8 +53,15 @@ def load(seq: int) -> dict[str, object]:
     Returns:
         Good checkpoint `seq` as a dict.
 
+    Raises:
+        TypeError: the fixture is not a JSON object.
+
     """
-    return json.loads((GOOD / f"{seq:08d}.json").read_text(encoding="utf-8"))
+    value: object = json.loads((GOOD / f"{seq:08d}.json").read_text(encoding="utf-8"))
+    if not vc.is_object(value):
+        msg = f"good checkpoint {seq} is not a JSON object"
+        raise TypeError(msg)
+    return value
 
 
 def write(repo: Path, record: dict[str, object], name: str | None = None) -> None:
@@ -82,11 +90,10 @@ def git_in(repo: Path, *args: str) -> None:
 class ChainCase(unittest.TestCase):
     """Each case runs in a fresh git repository with origin/main set."""
 
+    @override
     def setUp(self) -> None:
         """Make an empty anchor repository whose main is origin/main."""
-        patcher = mock.patch.dict(os.environ, GIT_ENV)
-        patcher.start()
-        self.addCleanup(patcher.stop)
+        self.enterContext(mock.patch.dict(os.environ, GIT_ENV))
         self.repo = Path(tempfile.mkdtemp(prefix="verify-chain-"))
         self.addCleanup(shutil.rmtree, self.repo)
         self.git("init", "-q", "-b", "main")
