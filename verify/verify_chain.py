@@ -24,10 +24,10 @@ import hashlib
 import json
 import os
 import re
-import subprocess  # ruff: ignore[suspicious-subprocess-import]
+import subprocess
 import sys
-from functools import cache
 from pathlib import Path
+from typing import TypeGuard, TypeIs
 
 PROG = "verify-chain"
 FIELDS = (
@@ -76,12 +76,22 @@ def canonical_head(record: dict[str, object]) -> str:
     return hashlib.sha256(text.encode()).hexdigest()
 
 
-def _is_int(value: object) -> bool:
+def _is_int(value: object) -> TypeGuard[int]:
     return isinstance(value, int) and not isinstance(value, bool)
 
 
 def _is_hex64(value: object) -> bool:
     return isinstance(value, str) and HEX64.match(value) is not None
+
+
+def is_object(value: object) -> TypeIs[dict[str, object]]:
+    """Say whether a decoded value is an object keyed by strings.
+
+    Returns:
+        True for a dict whose every key is a str.
+
+    """
+    return isinstance(value, dict) and all(isinstance(k, str) for k in value)
 
 
 def _shape_problem(record: dict[str, object]) -> str | None:
@@ -93,13 +103,14 @@ def _shape_problem(record: dict[str, object]) -> str | None:
     """
     extra = [k for k in record if k not in FIELDS]
     missing = [k for k in FIELDS if k not in record]
-    checks = (
+    checks: tuple[tuple[bool, str], ...] = (
         (bool(extra), f"unexpected field {extra[0]!r}" if extra else ""),
         (bool(missing), f"missing field {missing[0]!r}" if missing else ""),
     )
     for failed, problem in checks:
         if failed:
             return problem
+    seq = record["seq"]
     prev = record["prev_head"]
     last = record["last_act_id"]
     count = record["act_count"]
@@ -109,7 +120,7 @@ def _shape_problem(record: dict[str, object]) -> str | None:
             f"v is {record['v']!r}, expected 1",
         ),
         (
-            not _is_int(record["seq"]) or record["seq"] < 0,
+            not _is_int(seq) or seq < 0,
             "seq is not a non-negative integer",
         ),
         (
@@ -155,11 +166,11 @@ def read_record(directory: Path, name: str, expected_seq: int) -> dict[str, obje
         msg = f"{label}: seq gap, expected seq {expected_seq} next"
         raise ChainError(msg)
     try:
-        record = json.loads((directory / name).read_text(encoding="utf-8"))
+        record: object = json.loads((directory / name).read_text(encoding="utf-8"))
     except json.JSONDecodeError as err:
         msg = f"{label}: not valid JSON ({err.msg})"
         raise ChainError(msg) from err
-    if not isinstance(record, dict):
+    if not is_object(record):
         msg = f"{label}: not a JSON object"
         raise ChainError(msg)
     problem = _shape_problem(record)
@@ -205,7 +216,10 @@ def verify_files(directory: Path) -> list[dict[str, object]]:
     return chain
 
 
-@cache
+# git's answer, asked once per process: every git command reads it.
+_LOCAL_ENV_VARS: dict[str, frozenset[str]] = {}
+
+
 def repository_env_vars() -> frozenset[str]:
     """Name the variables through which git's caller picks a repository.
 
@@ -218,13 +232,17 @@ def repository_env_vars() -> frozenset[str]:
         The variable names.
 
     """
-    result = subprocess.run(
-        ["git", "rev-parse", "--local-env-vars"],  # ruff: ignore[start-process-with-partial-path]
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    return frozenset(result.stdout.split())
+    known = _LOCAL_ENV_VARS.get("names")
+    if known is None:
+        result = subprocess.run(
+            ["git", "rev-parse", "--local-env-vars"],  # ruff: ignore[start-process-with-partial-path]
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        known = frozenset(result.stdout.split())
+        _LOCAL_ENV_VARS["names"] = known
+    return known
 
 
 def git_env() -> dict[str, str]:
@@ -239,7 +257,6 @@ def git_env() -> dict[str, str]:
 
 
 def _git(repo: Path, *args: str) -> subprocess.CompletedProcess[str]:
-    # ruff: ignore[subprocess-without-shell-equals-true]
     return subprocess.run(
         ["git", "-C", str(repo), *args],  # ruff: ignore[start-process-with-partial-path]
         capture_output=True,
@@ -305,6 +322,13 @@ def verify_append_only(repo: Path, directory: str, base: str) -> None:
             raise ChainError(msg)
 
 
+class Args(argparse.Namespace):
+    """The arguments, typed as the parser declares them."""
+
+    repo: Path
+    base: str | None
+
+
 def main(argv: list[str] | None = None) -> int:
     """Run the verifier and report one line.
 
@@ -323,7 +347,7 @@ def main(argv: list[str] | None = None) -> int:
         "--base",
         help="compare against this commit instead of the derived base",
     )
-    args = parser.parse_args(argv)
+    args = parser.parse_args(argv, namespace=Args())
     try:
         line = verify(args.repo, args.base)
     except ChainError as err:
