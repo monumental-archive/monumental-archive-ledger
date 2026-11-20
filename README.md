@@ -66,7 +66,7 @@ meaningful properties: the head chain is internally consistent, and
 history here only ever appends. From any clone, with Python 3 and git:
 
 ```bash
-python3 verify/verify-chain.py
+python3 verify/verify_chain.py
 ```
 
 It fails by name unless every checkpoint has exactly the seven fields

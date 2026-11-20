@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Table tests for verify-chain.py (#27).
+"""Table tests for verify_chain.py (#27).
 
 The three checkpoints in testdata/good/ are measured vectors, not
 hand-computed ones: testdata/PROVENANCE.md says how each was made by
@@ -14,7 +14,6 @@ exit alone can pass for the wrong reason.
 stdlib `unittest`, the belt's one test idiom.
 """
 
-import importlib.util
 import io
 import json
 import os
@@ -26,12 +25,7 @@ from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 from unittest import mock
 
-_SPEC = importlib.util.spec_from_file_location(
-    "verify_chain",
-    Path(__file__).with_name("verify-chain.py"),
-)
-vc = importlib.util.module_from_spec(_SPEC)
-_SPEC.loader.exec_module(vc)
+import verify_chain as vc
 
 GOOD = Path(__file__).parent / "testdata" / "good"
 HEADS = (
