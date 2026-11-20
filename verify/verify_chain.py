@@ -14,7 +14,7 @@ never enter this repository by design.
 
 Standard library only, so a stranger needs nothing but Python and git:
 
-    python3 verify/verify-chain.py
+    python3 verify/verify_chain.py
 """
 
 from __future__ import annotations
