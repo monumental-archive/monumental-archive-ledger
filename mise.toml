@@ -24,6 +24,6 @@ shell = "bash -euo pipefail -c"
 [tasks.test]
 description = "Verify the published checkpoint chain, then the verifier's own tests"
 run = """
-python3 verify/verify_chain.py
-python3 -m unittest discover --start-directory verify --pattern "test_*.py"
+"${ORG_BELT_DIR}/measured" python3 verify/verify_chain.py
+"${ORG_BELT_DIR}/measured" python3 -m unittest discover --start-directory verify --pattern "test_*.py"
 """

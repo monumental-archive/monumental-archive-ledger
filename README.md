@@ -8,6 +8,7 @@
 [![OpenSSF Baseline](https://www.bestpractices.dev/projects/16736/baseline)](https://www.bestpractices.dev/projects/16736)
 [![REUSE status](https://api.reuse.software/badge/github.com/monumental-archive/monumental-archive-ledger)](https://api.reuse.software/info/github.com/monumental-archive/monumental-archive-ledger)
 [![license](https://img.shields.io/badge/license-CC0--1.0-blue)](LICENSES/)
+[![coverage](https://codecov.io/gh/monumental-archive/monumental-archive-ledger/branch/main/graph/badge.svg)](https://codecov.io/gh/monumental-archive/monumental-archive-ledger)
 [![fair-software](https://img.shields.io/badge/fair--software.eu-%E2%97%8F%20%E2%97%8F%20%E2%97%8B%20%E2%97%8B%20%E2%97%8F-orange)](https://fair-software.eu)
 <!-- badges:end -->
 
