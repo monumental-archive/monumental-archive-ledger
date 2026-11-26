@@ -215,7 +215,7 @@
   "discussion_status": "Met",
   "documentation_achievements_justification": "The README's generated badge block hyperlinks every achievement the repository holds (gate status, OpenSSF Scorecard, SLSA source level, REUSE) and holds pending ones as comments until earned; fix:badges renders it and lint:badges fails the gate if it drifts. https://github.com/monumental-archive/monumental-archive-ledger#readme",
   "documentation_achievements_status": "Met",
-  "documentation_architecture_justification": "README.md documents the structure: one file per sealed period, an RFC-6962-style Merkle tree over salted act hashes, a head that chains each checkpoint to the previous one, and one checkpoint per commit so the git DAG is a second tamper-evidence layer. https://github.com/monumental-archive/monumental-archive-ledger#what-a-checkpoint-is",
+  "documentation_architecture_justification": "README.md documents the structure: one file per sealed period, an RFC 6962 (section 2.1) Merkle tree over the period's act hashes, a head that chains each checkpoint to the previous one, and one checkpoint per commit so the git DAG is a second tamper-evidence layer. https://github.com/monumental-archive/monumental-archive-ledger#what-a-checkpoint-is",
   "documentation_architecture_status": "Met",
   "documentation_basics_justification": "README.md documents what the repository is, what a checkpoint is, why the chain exists and how it is verified.",
   "documentation_basics_status": "Met",
