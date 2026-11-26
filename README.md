@@ -34,16 +34,43 @@ digits (`00000000.json`, `00000001.json`, …):
 }
 ```
 
-- `merkle_root` — root of an RFC-6962-style Merkle tree whose leaves are
-  the period's act content hashes (each act hash covers the act's
-  envelope plus a **salted** hash of its payload — no payload, and no
-  guessable payload fingerprint, ever enters this repository).
+- `merkle_root` — root of an RFC 6962 (section 2.1) Merkle tree over
+  the period's act hashes, in ledger order: a leaf is
+  `SHA-256(0x00 || act hash)`, a node is
+  `SHA-256(0x01 || left || right)`. No payload, and no guessable
+  payload fingerprint, ever enters this repository.
+- `last_act_id` — the id of the period's last act in ledger order.
 - `head` — SHA-256 of the canonical JSON record
   `{"v":1,"prev_head":…,"merkle_root":…,"act_count":…,"last_act_id":…}`,
   chaining every checkpoint to the one before it.
 - One checkpoint = **one git commit**, so this repository's own commit
   DAG is a second tamper-evidence layer: rewriting an old checkpoint
   changes every later commit hash, and every clone in the world notices.
+
+## What an act hash is
+
+- An act is two rows, an envelope and a payload. Every column of
+  either is sealed except the visibility flags (`withheld_draft`,
+  `withheld_embargo`, `withheld_sensitivity`, `withheld_suppression`,
+  `public`, `payload_public`).
+- `payload_hash = SHA-256(salt || preimage("act-payload v3", P))`,
+  where `P` is the payload's columns (without `act_id` and the salt)
+  and the envelope columns an erasure removes (`subject_type`,
+  `snaktype`, `datatype`, `occurrence`, `sort_order`,
+  `reference_group_id`, `reference_type_id`, `rank`,
+  `reason_concept_id`, `admin_level`).
+- `act hash = SHA-256(preimage("act-envelope v3", E))`, where `E` is
+  every other envelope column, `payload_hash` included.
+- `preimage(prefix, columns)` is the prefix and a line feed, then for
+  each column that is not null, in byte order of its name:
+  `<name>=<length of the value in bytes>:<value>` and a line feed, all
+  UTF-8.
+- Values are written as PostgreSQL prints them: a UUID in lower case,
+  a number as stored, `true` or `false`, a time as
+  `2026-11-25T20:13:46.253357+00:00` (UTC, trailing zeros of the
+  fraction dropped), bytes as `\x` and lower-case hex.
+- An erased act has no salt and no payload; its `payload_hash` stays,
+  so its act hash still verifies.
 
 ## Why it exists
 
@@ -78,10 +105,11 @@ recomputes, and no checkpoint that existed at the merge base with
 modified, renamed or deleted. This repository's gate runs the same
 command and the verifier's own tests as its `test` task.
 
-Known gap: nothing compares the two. The archive verifies its database
-and this repository verifies its files; no automated check diffs one
-against the other. Nor is the Merkle root checked here: it needs the
-acts, which never enter this repository by design.
+Before every publication the archive updates its clone of this
+repository and compares each published checkpoint with its database,
+field by field; it refuses to publish on any difference. The Merkle
+root is not checked here: it needs the acts, which never enter this
+repository by design.
 
 Clones welcome — a copy of this repository IS the verification
 infrastructure.
